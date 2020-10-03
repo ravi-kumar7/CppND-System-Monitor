@@ -97,14 +97,41 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { 
+    std::ifstream filestream(kProcDirectory+kStatFilename);
+    string line,key;
+    int value;
+    while(std::getline(filestream, line)){
+        std::istringstream linestream(line);
+        linestream >> key>> value;
+        if(key == "procs_running")
+         break;
+    }
+    return value;
+ }
 
 // TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+int LinuxParser::RunningProcesses() { 
+    std::ifstream filestream(kProcDirectory+kStatFilename);
+    string line,key;
+    int value;
+    while(std::getline(filestream, line)){
+        std::istringstream linestream(line);
+        linestream >> key>> value;
+        if(key == "processes")
+         break;
+    }
+    return value;
+ }
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) { 
+  std::ifstream filestream(kProcDirectory+std::to_string(pid)+kCmdlineFilename);
+  string cmd;
+  std::getline(filestream, cmd);
+  return cmd;
+}
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -127,7 +154,19 @@ string LinuxParser::Uid(int pid) {
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid) { 
+   string user_id =  Uid(pid);
+    std::ifstream filestream(kPasswordPath);
+    string line,key,value;
+    while(std::getline(filestream, line)){
+        std::replace(line.begin(),line.end(),':',' ');
+        std::istringstream linestream(line);
+        linestream >> key>> value;
+        if(value == user_id)
+         break;
+    }
+    return key;
+   }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
