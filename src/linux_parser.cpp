@@ -67,7 +67,20 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() { 
+  std::ifstream filestream(kProcDirectory+kMeminfoFilename);
+        string line, key;
+        std::getline(filestream, line);
+        std::istringstream linestream(line);
+        long total_mem, free_mem;
+        linestream >> key >> total_mem;
+        std::getline(filestream, line);
+        std::istringstream secondlinestream(line);
+        secondlinestream >> key >> free_mem;
+        float mem_utilization = (total_mem - free_mem)/1000.0f;
+        return mem_utilization;  
+  
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { 
@@ -135,7 +148,19 @@ string LinuxParser::Command(int pid) {
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Ram(int pid) { 
+  std::ifstream filestream("./proc/"+std::to_string(pid)+"/status");
+  string line,key;
+  long value;
+  while(std::getline(filestream, line)){
+        std::istringstream linestream(line);
+        linestream >> key>> value;
+        if(key == "VmSize:")
+         break;
+  } 
+  float ram = value/1000.0;
+  return std::to_string(ram) + " MB"; 
+ }
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -170,4 +195,12 @@ string LinuxParser::User(int pid) {
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid) { 
+    std::ifstream filestream(kProcDirectory+std::to_string(pid)+kStatusFilename);
+    string line,key;
+    long value;
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    linestream >> value>> key >> key >> value>> value>> value>> value>> value>> value>> value >> value>> value>> value>> value>> value>> value>> value>> value>> value>> value>> value>> value ;
+    return value; 
+ }
