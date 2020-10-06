@@ -98,18 +98,46 @@ long LinuxParser::Jiffies() { return 0; }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) {
+    std::ifstream filestream(kProcDirectory+std::to_string(pid)+kStatFilename);
+    string line,key;
+    long value,utime,stime,cutime,cstime;
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    linestream >> value>> key >> key >> value>> value>> value>> value>> value>> value>> value >> value>> value>> value>> utime>> stime>> cutime>> cstime;
+    return utime+stime+cutime+cstime; 
+
+ }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() { 
+  std::vector<string> cpu_data;
+  std::ifstream filestream(kProcDirectory+kStatFilename);
+  string line,key;
+  long utime, ntime, systime;
+  std::getline(filestream, line);
+  std::istringstream linestream(line);
+  linestream >> key >> utime >> ntime >> systime;
+  return utime+ntime+systime; 
+}
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() { 
+  std::vector<string> cpu_data;
+  std::ifstream filestream(kProcDirectory+kStatFilename);
+  string line,key;
+  long time;
+  std::getline(filestream, line);
+  std::istringstream linestream(line);
+  linestream >> key >> time >> time >> time >> time;
+  return time; 
+
+}
 
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { 
   std::vector<string> cpu_data;
-  std::ifstream filestream("./proc/stat");
+  std::ifstream filestream(kProcDirectory+kStatFilename);
   string line,value;
   std::getline(filestream, line);
   std::istringstream linestream(line);
@@ -161,7 +189,7 @@ string LinuxParser::Command(int pid) {
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid) { 
-  std::ifstream filestream("./proc/"+std::to_string(pid)+"/status");
+  std::ifstream filestream(kProcDirectory+std::to_string(pid)+kStatusFilename);
   string line,key;
   long value;
   while(std::getline(filestream, line)){
