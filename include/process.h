@@ -2,6 +2,7 @@
 #define PROCESS_H
 
 #include <string>
+#include "linux_parser.h"
 /*
 Basic class for Process representation
 It contains relevant attributes as shown below
@@ -19,11 +20,12 @@ class Process {
       user_ = LinuxParser::User(id);
       command_ = LinuxParser::Command(id);
   }
-
   // TODO: Declare any necessary private members
  private:
-    std::string user_="";
+   std::string user_="";
     std::string command_="";
+    std::string ram_;
+    float cpu_usage_=0;
     int pid_=-1;
 };
 

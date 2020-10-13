@@ -4,6 +4,7 @@
 #include <fstream>
 #include <regex>
 #include <string>
+#include <iomanip>
 
 namespace LinuxParser {
 // Paths

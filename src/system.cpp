@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "process.h"
 #include "processor.h"
@@ -13,22 +14,30 @@ using std::size_t;
 using std::string;
 using std::vector;
 
+System::System() {
+    System::kernel_ = LinuxParser::Kernel();
+    System::operating_system_ = LinuxParser::OperatingSystem();
+}
+
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() { 
     auto processess_ids = LinuxParser::Pids();
+    processes_.clear();
     for(int id:processess_ids){
         Process p(id);
+        p.CpuUtilization();
         processes_.push_back(p);
-    } 
+    }
+    //sort the process on the basis of CPU utilization, higher to lower
+    std::sort(processes_.begin(),processes_.end());
+    std::reverse(processes_.begin(), processes_.end());
     return processes_; }
 
 // TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() { 
-    if(System::kernel_ == "")
-        System::kernel_ = LinuxParser::Kernel();
     return System::kernel_;
  }
 
@@ -37,8 +46,6 @@ float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 
 // TODO: Return the operating system name
 std::string System::OperatingSystem() { 
-    if(System::operating_system_ == "")
-        System::operating_system_ = LinuxParser::OperatingSystem();
     return System::operating_system_;
  }
 
